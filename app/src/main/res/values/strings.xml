@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name" translatable="false">Eat It</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="popular_categories">Popular Categories</string>
+    <string name="best_deals">Best Deals</string>
+    <string name="categories">Categories</string>
+    <string name="logout">Logout</string>
+    <string name="meal">Meal</string>
+    <string name="price">Price</string>
+    <string name="favorite">Favorite</string>
+</resources>
