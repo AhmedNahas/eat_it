@@ -10,12 +10,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class CategoryViewModel : ViewModel() {
+class SharedViewModel : ViewModel() {
 
     val categoriesLiveData = MutableLiveData<ArrayList<CategoryModel>>()
 
 
-    private fun loadPopularList() {
+    fun loadPopularList() {
         val tempList = ArrayList<CategoryModel>()
         val reference = FirebaseDatabase.getInstance().getReference(Common.CATEGORY)
         reference.orderByKey().addListenerForSingleValueEvent(object : ValueEventListener {
@@ -39,10 +39,6 @@ class CategoryViewModel : ViewModel() {
 
     fun getCategoriesListLiveData(): MutableLiveData<ArrayList<CategoryModel>> {
         return categoriesLiveData
-    }
-
-    init {
-        loadPopularList()
     }
 
 }

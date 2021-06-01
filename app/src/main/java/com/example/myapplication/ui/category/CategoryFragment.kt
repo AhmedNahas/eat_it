@@ -5,7 +5,8 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,7 +20,7 @@ class CategoryFragment : Fragment(R.layout.fragment_category) {
 
     private var _binding: FragmentCategoryBinding? = null
     private val binding get() = _binding!!
-    private val mViewModel: CategoryViewModel by viewModels()
+    private val mViewModel: SharedViewModel by activityViewModels()
     private var layoutAnimationController: LayoutAnimationController? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -29,6 +30,7 @@ class CategoryFragment : Fragment(R.layout.fragment_category) {
 
         layoutAnimationController =
             AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_item_from_left)
+        mViewModel.loadPopularList()
         subscribeToLiveData()
     }
 
