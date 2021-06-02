@@ -39,6 +39,13 @@
         <argument
             android:name="chosenCategory"
             app:argType="com.example.myapplication.model.CategoryModel" />
+        <action
+            android:id="@+id/action_foodFragment_to_foodDetailFragment"
+            app:destination="@id/foodDetailFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/foodDetailFragment"
+        android:name="com.example.myapplication.ui.foodDetail.FoodDetailFragment"
+        android:label="FoodDetailFragment" />
 
 </navigation>

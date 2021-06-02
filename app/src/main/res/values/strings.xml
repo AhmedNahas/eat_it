@@ -12,4 +12,5 @@
     <string name="meal">Meal</string>
     <string name="price">Price</string>
     <string name="favorite">Favorite</string>
+    <string name="plus">+</string>
 </resources>
