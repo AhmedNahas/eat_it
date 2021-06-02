@@ -46,6 +46,10 @@
     <fragment
         android:id="@+id/foodDetailFragment"
         android:name="com.example.myapplication.ui.foodDetail.FoodDetailFragment"
-        android:label="FoodDetailFragment" />
+        android:label="FoodDetailFragment" >
+        <argument
+            android:name="food"
+            app:argType="com.example.myapplication.model.FoodModel" />
+    </fragment>
 
 </navigation>

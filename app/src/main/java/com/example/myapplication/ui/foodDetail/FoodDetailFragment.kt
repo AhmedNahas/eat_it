@@ -1,47 +1,59 @@
 package com.example.myapplication.ui.foodDetail
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentFoodDetailBinding
 
-class FoodDetailFragment : Fragment(R.layout.fragment_food_detail,) {
+class FoodDetailFragment : Fragment() {
 
-    private val mViewModel: FoodDetailViewModel by viewModels()
     private var _binding: FragmentFoodDetailBinding? = null
     private val binding get() = _binding!!
     private var layoutAnimationController: LayoutAnimationController? = null
+    private val args: FoodDetailFragmentArgs by navArgs()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = DataBindingUtil.inflate(inflater,R.layout.fragment_food_detail,container,false)
+        return _binding!!.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentFoodDetailBinding.bind(view)
+        setupUI()
+        subscribeToLiveData()
+    }
+
+    private fun setupUI() {
         binding.topAppBar.setNavigationOnClickListener { findNavController().navigateUp() }
         layoutAnimationController =
             AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_item_from_left)
-        subscribeToLiveData()
-
+        var quantity = 1
+        binding.btnIncrease.setOnClickListener {
+            quantity++
+            binding.tvFoodQuantity.text = quantity.toString()
+        }
+        binding.btnDecrease.setOnClickListener {
+            if (quantity != 1) quantity--
+            binding.tvFoodQuantity.text = quantity.toString()
+        }
     }
 
     private fun subscribeToLiveData() {
-  /*      binding.loading.visibility = View.VISIBLE
-        mViewModel.getCategoriesListLiveData().observe(viewLifecycleOwner, {
-            if (!it.isNullOrEmpty()){
-                binding.title = args.chosenCategory.name
-                val adapter = FoodAdapter(requireContext(), args.chosenCategory.foods)
-                binding.rvFood.adapter = adapter
-                binding.rvFood.layoutAnimation = layoutAnimationController
-            }else{
-                Toast.makeText(requireContext(),"Connection Failed !", Toast.LENGTH_LONG).show()
-            }
-            binding.loading.visibility = View.GONE
-        })
-*/
-
+        if (args != null)
+            binding.lifecycleOwner = this
+            binding.food = args.food
     }
 
     override fun onDestroyView() {

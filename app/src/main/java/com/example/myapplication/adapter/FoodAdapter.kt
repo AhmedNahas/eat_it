@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.myapplication.R
 import com.example.myapplication.databinding.ItemFoodBinding
 import com.example.myapplication.model.FoodModel
+import com.example.myapplication.ui.food.FoodFragmentDirections
 
 class FoodAdapter(
     internal var context: Context,
@@ -39,7 +39,10 @@ class FoodAdapter(
             Glide.with(context).load(food.image).into(binding.ivPicFood)
             binding.tvNameMeal.text = food.name
             binding.tvPriceMeal.text = food.price.toString()
-            binding.root.setOnClickListener { Navigation.findNavController(it).navigate(R.id.action_foodFragment_to_foodDetailFragment) }
+            binding.root.setOnClickListener {
+                Navigation.findNavController(it)
+                    .navigate(FoodFragmentDirections.actionFoodFragmentToFoodDetailFragment(food))
+            }
         }
     }
 }

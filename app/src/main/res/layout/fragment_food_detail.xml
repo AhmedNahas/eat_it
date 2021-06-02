@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="title"
-            type="String" />
+            name="food"
+            type="com.example.myapplication.model.FoodModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -19,7 +19,7 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
-            android:layout_height="152dp"
+            android:layout_height="@dimen/_200sdp"
             android:fitsSystemWindows="true">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -37,9 +37,11 @@
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:contentDescription="@string/popular_categories"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
-                    android:src="@color/teal_700" />
+                    android:src="@color/teal_700"
+                    imageFood="@{food.image}"/>
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/topAppBar"
@@ -49,7 +51,7 @@
                     android:background="@android:color/transparent"
                     app:layout_collapseMode="pin"
                     app:navigationIcon="@drawable/ic_back"
-                    app:title="@{title}" />
+                    app:title="@string/meal_detail" />
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -59,97 +61,160 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            >
-            <androidx.cardview.widget.CardView
+            android:background="@color/white_shade"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="@color/white"
-                android:layout_margin="@dimen/_10sdp"
-                android:padding="@dimen/_8sdp"
-                android:elevation="@dimen/_20sdp"
-                app:layout_constraintHeight_percent=".78"
-                app:layout_constraintVertical_bias="1"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:targetApi="lollipop">
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_4sdp">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="0dp"
+                    android:layoutDirection="locale"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/_8sdp"
+                    app:cardElevation="@dimen/_2sdp"
+                    app:cardUseCompatPadding="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
-                        android:id="@+id/tv_food_name"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/teal_700"
-                        android:textSize="@dimen/_20ssp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="@string/popular_categories" />
-
-                    <TextView
-                        android:id="@+id/tv_food_price"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/_20ssp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_food_name"
-                        tools:text="@string/price" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@color/pink"
-                        android:gravity="start"
-                        android:orientation="horizontal"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_food_price">
-
-                        <Button
-                            android:id="@+id/btn_increase"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                            android:layout_width="@dimen/_40sdp"
-                            android:layout_marginStart="@dimen/_4sdp"
-                            android:layout_height="wrap_content"
-                            app:icon="@drawable/ic_add" />
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/_5sdp">
 
                         <TextView
-                            android:id="@+id/tv_food_quantity"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/tv_food_name"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:layout_marginStart="@dimen/_4sdp"
-                            android:textSize="@dimen/_15ssp"
+                            android:textColor="@color/teal_700"
+                            android:textSize="@dimen/_20ssp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:text="@{food.name}" />
+
+                        <TextView
+                            android:id="@+id/tv_food_price"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_20ssp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/tv_food_name"
-                            tools:text="1" />
+                            intText="@{food.price}"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_food_price">
+
+                            <Button
+                                android:id="@+id/btn_increase"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                                android:layout_width="@dimen/_40sdp"
+                                android:layout_height="wrap_content"
+                                android:background="@color/white"
+                                app:icon="@drawable/ic_add" />
+
+                            <TextView
+                                android:id="@+id/tv_food_quantity"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:text="@string/_1"
+                                android:textColor="@color/teal_700"
+                                android:textSize="@dimen/_15ssp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/tv_food_name" />
+
+                            <Button
+                                android:id="@+id/btn_decrease"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                                android:layout_width="@dimen/_40sdp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="@dimen/_4sdp"
+                                android:background="@color/white"
+                                android:gravity="center"
+                                app:icon="@drawable/ic_minus" />
+
+
+                        </LinearLayout>
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layoutDirection="locale"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/_8sdp"
+                    app:cardElevation="@dimen/_2sdp"
+                    app:cardUseCompatPadding="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cardView"
+                    >
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/_5sdp">
+
+                        <RatingBar
+                            android:id="@+id/rB_food"
+                            style="@android:style/Widget.DeviceDefault.RatingBar.Indicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:isIndicator="true"
+                            android:numStars="5"
+                            android:stepSize=".5"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="@string/popular_categories" />
+
+                        <TextView
+                            android:id="@+id/tv_food_discription"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_50sdp"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_20ssp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/rB_food"
+                            tools:text="@string/description"
+                            android:text="@{food.description}"/>
 
                         <Button
-                            android:id="@+id/btn_decrease"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                            android:layout_width="@dimen/_40sdp"
-                            android:gravity="center"
-                            android:layout_marginStart="@dimen/_4sdp"
-                            android:layout_marginEnd="@dimen/_4sdp"
+                            android:id="@+id/btn_show_comment"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:icon="@drawable/ic_minus" />
+                            android:layout_marginEnd="@dimen/_4sdp"
+                            android:text="@string/show_comment"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_food_discription" />
 
 
-                    </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
 
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
 
         </ScrollView>
-
 
 
         <androidx.constraintlayout.widget.ConstraintLayout

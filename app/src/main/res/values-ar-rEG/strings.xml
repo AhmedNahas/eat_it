@@ -11,4 +11,7 @@
     <string name="meal">Meal</string>
     <string name="price">Price</string>
     <string name="favorite">Favorite</string>
+    <string name="description">Description</string>
+    <string name="show_comment">Show Comment</string>
+    <string name="meal_detail">Meal Detail</string>
 </resources>
