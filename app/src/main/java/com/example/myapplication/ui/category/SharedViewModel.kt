@@ -30,10 +30,12 @@ class SharedViewModel : ViewModel() {
                 categoriesLiveData.value = tempList
             }
 
+
             override fun onCancelled(error: DatabaseError) {
                 Log.d(CategoryFragment.TAG, "onCancelled: $error")
             }
         })
+        reference.child("Comments").child("good")
     }
 
 

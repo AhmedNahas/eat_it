@@ -8,5 +8,7 @@ class Common {
         const val POPULAR_REF : String = "MostPopular"
         const val BEST_DEALS : String = "BestDeals"
         const val CATEGORY : String = "Category"
+        const val COMMENT_REF : String = "Comments"
+        const val FOODS_REF : String = "foods"
     }
 }

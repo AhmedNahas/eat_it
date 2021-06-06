@@ -14,4 +14,7 @@
     <string name="description">Description</string>
     <string name="show_comment">Show Comment</string>
     <string name="meal_detail">Meal Detail</string>
+    <string name="rate_meal">Rate Meal</string>
+    <string name="your_comments">Your comments</string>
+    <string name="cancel">Cancel</string>
 </resources>

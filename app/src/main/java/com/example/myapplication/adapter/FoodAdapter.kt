@@ -26,7 +26,7 @@ class FoodAdapter(
     }
 
     override fun onBindViewHolder(holder: FoodViewHolder, position: Int) {
-        holder.bind(foodList!![position])
+        holder.bind(foodList!![position],position)
     }
 
     override fun getItemCount(): Int {
@@ -35,10 +35,11 @@ class FoodAdapter(
 
     inner class FoodViewHolder(private val binding: ItemFoodBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(food: FoodModel) {
+        fun bind(food: FoodModel,position: Int) {
             Glide.with(context).load(food.image).into(binding.ivPicFood)
             binding.tvNameMeal.text = food.name
             binding.tvPriceMeal.text = food.price.toString()
+            food.key = position.toString()
             binding.root.setOnClickListener {
                 Navigation.findNavController(it)
                     .navigate(FoodFragmentDirections.actionFoodFragmentToFoodDetailFragment(food))

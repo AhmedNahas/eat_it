@@ -180,9 +180,11 @@
                             android:isIndicator="true"
                             android:numStars="5"
                             android:stepSize=".5"
+                            android:clickable="true"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            tools:text="@string/popular_categories" />
+                            tools:text="@string/popular_categories"
+                            android:focusable="true" />
 
                         <TextView
                             android:id="@+id/tv_food_discription"

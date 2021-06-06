@@ -7,7 +7,6 @@ import android.view.animation.LayoutAnimationController
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.myapplication.R
@@ -39,6 +38,7 @@ class FoodFragment : Fragment(R.layout.fragment_food) {
         mViewModel.getCategoriesListLiveData().observe(viewLifecycleOwner, {
             if (!it.isNullOrEmpty()){
                 binding.title = args.chosenCategory.name
+                args.chosenCategory.foods?.forEach { it.menuId = args.chosenCategory.menuId }
                 val adapter = FoodAdapter(requireContext(), args.chosenCategory.foods)
                 binding.rvFood.adapter = adapter
                 binding.rvFood.layoutAnimation = layoutAnimationController
