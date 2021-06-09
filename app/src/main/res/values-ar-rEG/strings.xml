@@ -17,4 +17,8 @@
     <string name="rate_meal">Rate Meal</string>
     <string name="your_comments">Your comments</string>
     <string name="cancel">Cancel</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="phone">Phone</string>
+    <string name="address">Address</string>
 </resources>

@@ -2,14 +2,19 @@ package com.example.myapplication.ui.registerLogin
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import com.example.myapplication.MyApplication
 import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentRegisterBinding
+import com.example.myapplication.model.UserModel
+import com.example.myapplication.utils.Common
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 
 class RegisterFragment : Fragment(R.layout.fragment_register) {
     private var _binding: FragmentRegisterBinding? = null
@@ -20,18 +25,24 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentRegisterBinding.bind(view)
         setupUi()
-
-
         auth = Firebase.auth
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            //reload()
-        }
-
-
     }
 
     private fun setupUi() {
+        binding.etFirstName.also {
+            it.translationX = 800F
+            it.alpha = 0F
+            it.animate().translationX(0F).alpha(1F).setDuration(800)
+                .setStartDelay(100)
+                .start()
+        }
+        binding.etLastName.also {
+            it.translationX = 800F
+            it.alpha = 0F
+            it.animate().translationX(0F).alpha(1F).setDuration(800)
+                .setStartDelay(200)
+                .start()
+        }
         binding.etEmail.also {
             it.translationX = 800F
             it.alpha = 0F
@@ -74,19 +85,38 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private fun registerUser(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
             if (it.isSuccessful) {
-                // Sign in success, update UI with the signed-in user's information
                 Log.d(TAG, "registerUser: success")
                 val user = auth.currentUser
-//                updateUI(user)
+                addUserToDB(user!!.uid)
             } else {
-                // If sign in fails, display a message to the user.
                 Log.w(TAG, "registerUser:failure", it.exception)
                 Toast.makeText(
                     requireContext(), "Authentication failed.",
                     Toast.LENGTH_SHORT
                 ).show()
-//                updateUI(null)
             }
         }
+    }
+
+    private fun addUserToDB(uid: String) {
+        val newUser = UserModel(
+            binding.etAddress.editText?.text.toString(),
+            binding.etFirstName.editText?.text.toString()
+                    + " " + binding.etLastName.editText?.text.toString(),
+            binding.etPhone.editText?.text.toString(),
+            uid
+        )
+        FirebaseDatabase.getInstance().getReference(Common.USER)
+            .push().setValue(newUser)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Toast.makeText(requireContext(), "Success", Toast.LENGTH_LONG)
+                        .show()
+                    MyApplication.getInstance()!!.prefrences.setCurrentUserInfo(Gson().toJson(newUser))
+                } else
+                    Toast.makeText(requireContext(), it.exception.toString(), Toast.LENGTH_LONG)
+                        .show()
+
+            }
     }
 }

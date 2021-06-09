@@ -14,16 +14,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.myapplication.MyApplication
 import com.example.myapplication.R
 import com.example.myapplication.databinding.BottomsheetRatingBinding
 import com.example.myapplication.databinding.FragmentFoodDetailBinding
 import com.example.myapplication.model.CommentModel
 import com.example.myapplication.model.FoodModel
+import com.example.myapplication.model.UserModel
 import com.example.myapplication.utils.Common
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.google.gson.Gson
 
 class FoodDetailFragment : Fragment() {
 
@@ -68,7 +71,7 @@ class FoodDetailFragment : Fragment() {
             )
         }
 
-        binding.rBFood.setOnTouchListener(View.OnTouchListener { v, event ->
+        binding.rBFood.setOnTouchListener(View.OnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 showRatingBottomSheet()
             }
@@ -96,12 +99,16 @@ class FoodDetailFragment : Fragment() {
 
 
     private fun showRatingBottomSheet() {
+        val currUser = Gson().fromJson(
+            MyApplication.getInstance()!!.prefrences.getCurrentUserInfo(),
+            UserModel::class.java
+        )
         val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
         val dialogBinding = BottomsheetRatingBinding.inflate(LayoutInflater.from(requireContext()))
         dialogBinding.btnOkay.setOnClickListener {
             val comment = CommentModel()
             comment.comment = dialogBinding.etComment.text.toString()
-            comment.name = currentUser?.displayName
+            comment.name = currUser.name
             comment.uid = currentUser?.uid
             comment.ratingValue = dialogBinding.rBFood.rating
             val serverTimeStamp = HashMap<String, Any>()
