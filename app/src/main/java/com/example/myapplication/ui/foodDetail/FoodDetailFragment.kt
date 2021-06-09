@@ -2,12 +2,11 @@ package com.example.myapplication.ui.foodDetail
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import android.view.animation.LayoutAnimationController
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.databinding.DataBindingUtil
@@ -31,7 +30,6 @@ class FoodDetailFragment : Fragment() {
     private var currentUser: FirebaseUser? = null
     private var _binding: FragmentFoodDetailBinding? = null
     private val binding get() = _binding!!
-    private var layoutAnimationController: LayoutAnimationController? = null
     private val args: FoodDetailFragmentArgs by navArgs()
     private val viewModel: FoodDetailViewModel by viewModels()
 
@@ -54,8 +52,6 @@ class FoodDetailFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() {
         binding.topAppBar.setNavigationOnClickListener { findNavController().navigateUp() }
-        layoutAnimationController =
-            AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_item_from_left)
         var quantity = 1
         binding.btnIncrease.setOnClickListener {
             quantity++
@@ -66,6 +62,12 @@ class FoodDetailFragment : Fragment() {
             binding.tvFoodQuantity.text = quantity.toString()
         }
 
+        binding.btnShowComment.setOnClickListener {
+            findNavController().navigate(
+                FoodDetailFragmentDirections.actionFoodDetailFragmentToCommentFragment(args.food.id!!)
+            )
+        }
+
         binding.rBFood.setOnTouchListener(View.OnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 showRatingBottomSheet()
@@ -73,6 +75,25 @@ class FoodDetailFragment : Fragment() {
             return@OnTouchListener true
         })
     }
+
+    private fun subscribeToLiveData() {
+        currentUser = FirebaseAuth.getInstance().currentUser
+        binding.lifecycleOwner = this
+        binding.food = args.food
+        binding.rBFood.rating = args.food.ratingValue.toFloat()
+
+        viewModel.getCommentLiveData().observe(viewLifecycleOwner, {
+            FirebaseDatabase.getInstance().getReference(Common.COMMENT_REF)
+                .child(args.food.id.toString()).push()
+                .setValue(it).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "OnCompleteListener: ${task.isSuccessful}")
+                        addRatingToFood(it.ratingValue)
+                    }
+                }
+        })
+    }
+
 
     private fun showRatingBottomSheet() {
         val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
@@ -95,23 +116,6 @@ class FoodDetailFragment : Fragment() {
         bottomSheetDialog.show()
     }
 
-    private fun subscribeToLiveData() {
-        currentUser = FirebaseAuth.getInstance().currentUser
-        binding.lifecycleOwner = this
-        binding.food = args.food
-        binding.rBFood.rating = args.food.ratingValue.toFloat()
-
-        viewModel.getCommentLiveData().observe(viewLifecycleOwner, {
-            FirebaseDatabase.getInstance().getReference(Common.COMMENT_REF)
-                .child(args.food.id.toString()).push()
-                .setValue(it).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        addRatingToFood(it.ratingValue)
-                    }
-                }
-        })
-    }
-
     private fun addRatingToFood(ratingValue: Float) {
         FirebaseDatabase.getInstance().getReference(Common.CATEGORY)
             .child(args.food.menuId.toString())
@@ -126,7 +130,7 @@ class FoodDetailFragment : Fragment() {
                         val ratingCount = food.ratingCount + 1
                         val result = sumRating / ratingCount
 
-                        val updateData = HashMap<String,Any>()
+                        val updateData = HashMap<String, Any>()
                         updateData["ratingValue"] = result
                         updateData["ratingCount"] = ratingCount
 
@@ -135,8 +139,10 @@ class FoodDetailFragment : Fragment() {
 
                         snapshot.ref.updateChildren(updateData).addOnCompleteListener {
                             binding.loading.visibility = View.GONE
-                            if (it.isSuccessful){
+                            if (it.isSuccessful) {
+                                Log.d(TAG, "onDataChange: ${it.isSuccessful}")
                                 viewModel.setFood(food)
+                                binding.rBFood.rating = result.toFloat()
                                 Toast.makeText(requireContext(), "Thank you !", LENGTH_LONG).show()
                             }
                         }
