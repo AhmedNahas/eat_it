@@ -13,7 +13,7 @@ class BindingUtils {
         @JvmStatic
         @BindingAdapter("intText")
         fun setText(view: TextView, value: Long) {
-            view.text = value.toString()
+            view.text = value.toDouble().toString()
         }
 
         @JvmStatic

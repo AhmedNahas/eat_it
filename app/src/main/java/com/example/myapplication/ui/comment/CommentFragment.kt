@@ -9,13 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.example.myapplication.adapter.CommentAdapter
 import com.example.myapplication.databinding.FragmentCommentBinding
-import com.example.myapplication.model.CommentModel
-import com.example.myapplication.utils.Common
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 
 class CommentFragment : BottomSheetDialogFragment() {
 
@@ -29,43 +23,29 @@ class CommentFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentCommentBinding.inflate(layoutInflater,container,false)
+        _binding = FragmentCommentBinding.inflate(layoutInflater, container, false)
         return binding.root
 
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        getComments()
         subscribeToLiveData()
     }
 
     private fun subscribeToLiveData() {
+        viewModel.getComments(args.foodId)
         viewModel.commentLiveData.observe(viewLifecycleOwner, {
             binding.loading.visibility = View.GONE
-            binding.rvComments.setHasFixedSize(true)
-            val adapter = CommentAdapter(requireContext(), it)
-            binding.rvComments.adapter = adapter
+            if (it != null){
+                binding.rvComments.setHasFixedSize(true)
+                val adapter = CommentAdapter(requireContext(), it)
+                binding.rvComments.adapter = adapter
+            }else{
+                Toast.makeText(requireContext(), "Failed ", Toast.LENGTH_LONG).show()
+            }
+
         })
-    }
-
-    private fun getComments() {
-        FirebaseDatabase.getInstance().getReference(Common.COMMENT_REF).child(args.foodId)
-            .orderByChild("commentTimeStamp").limitToLast(100)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val commentList = mutableListOf<CommentModel>()
-                    for (value in snapshot.children) {
-                        val comment = value.getValue(CommentModel::class.java)
-                        commentList.add(comment!!)
-                        viewModel.setCommentList(commentList)
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(requireContext(), error.message, Toast.LENGTH_LONG).show()
-                }
-            })
     }
 
     override fun onDestroyView() {

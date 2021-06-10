@@ -1,5 +1,9 @@
 package com.example.myapplication.utils
 
+import java.lang.StringBuilder
+import java.math.RoundingMode
+import java.text.DecimalFormat
+
 class Common {
     companion object {
         const val PFER_NAME: String = "EatItPrefrences"
@@ -12,5 +16,16 @@ class Common {
         const val CATEGORY : String = "Category"
         const val COMMENT_REF : String = "Comments"
         const val FOODS_REF : String = "foods"
+
+        fun formatPrice(price : Double) : String{
+            if (price != 0.toDouble()){
+                val df = DecimalFormat("#,##0.00")
+                df.roundingMode = RoundingMode.HALF_UP
+                val finalPrice = StringBuilder(df.format(price)).toString()
+                return finalPrice.replace(".",",")
+            } else
+                return "0,00"
+        }
     }
+
 }

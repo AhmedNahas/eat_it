@@ -35,13 +35,13 @@
                 app:statusBarScrim="?attr/colorPrimaryVariant">
 
                 <ImageView
+                    imageFood="@{food.image}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:contentDescription="@string/popular_categories"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
-                    android:src="@color/teal_700"
-                    imageFood="@{food.image}"/>
+                    android:src="@color/teal_700" />
 
                 <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/topAppBar"
@@ -90,12 +90,12 @@
                             android:id="@+id/tv_food_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:text="@{food.name}"
                             android:textColor="@color/teal_700"
                             android:textSize="@dimen/_20ssp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            android:text="@{food.name}" />
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/tv_food_price"
@@ -105,8 +105,7 @@
                             android:textSize="@dimen/_20ssp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/tv_food_name"
-                            intText="@{food.price}"/>
+                            app:layout_constraintTop_toBottomOf="@+id/tv_food_name" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -154,6 +153,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <androidx.cardview.widget.CardView
+                    android:id="@+id/cV_rate"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layoutDirection="locale"
@@ -163,8 +163,7 @@
                     app:cardUseCompatPadding="true"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cardView"
-                    >
+                    app:layout_constraintTop_toBottomOf="@+id/cardView">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -176,25 +175,25 @@
                             style="@android:style/Widget.DeviceDefault.RatingBar.Indicator"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:isIndicator="true"
                             android:numStars="5"
                             android:stepSize=".5"
-                            android:clickable="true"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            android:focusable="true" />
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/tv_food_discription"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/_50sdp"
+                            android:text="@{food.description}"
                             android:textColor="@color/black"
                             android:textSize="@dimen/_20ssp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/rB_food"
-                            tools:text="@string/description"
-                            android:text="@{food.description}"/>
+                            tools:text="@string/description" />
 
                         <Button
                             android:id="@+id/btn_show_comment"
@@ -211,6 +210,47 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layoutDirection="locale"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="@dimen/_8sdp"
+                    app:cardElevation="@dimen/_2sdp"
+                    app:cardUseCompatPadding="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cV_rate">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="@dimen/_5sdp">
+
+                        <TextView
+                            android:id="@+id/tv_size"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/size"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_20ssp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="@string/description" />
+
+                        <RadioGroup
+                            android:id="@+id/radioGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:checkedButton="@+id/radio_button_medium"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/tv_size"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.cardview.widget.CardView>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.databinding.DataBindingUtil
@@ -20,6 +22,7 @@ import com.example.myapplication.databinding.BottomsheetRatingBinding
 import com.example.myapplication.databinding.FragmentFoodDetailBinding
 import com.example.myapplication.model.CommentModel
 import com.example.myapplication.model.FoodModel
+import com.example.myapplication.model.SizeModel
 import com.example.myapplication.model.UserModel
 import com.example.myapplication.utils.Common
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -27,6 +30,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.gson.Gson
+import java.lang.StringBuilder
+import kotlin.math.roundToInt
 
 class FoodDetailFragment : Fragment() {
 
@@ -59,10 +64,12 @@ class FoodDetailFragment : Fragment() {
         binding.btnIncrease.setOnClickListener {
             quantity++
             binding.tvFoodQuantity.text = quantity.toString()
+            binding.tvFoodPrice.text = (binding.tvFoodPrice.text.toString().toDouble() * quantity).toString()
         }
         binding.btnDecrease.setOnClickListener {
             if (quantity != 1) quantity--
             binding.tvFoodQuantity.text = quantity.toString()
+            binding.tvFoodPrice.text = (binding.tvFoodPrice.text.toString().toDouble() * quantity).toString()
         }
 
         binding.btnShowComment.setOnClickListener {
@@ -77,6 +84,8 @@ class FoodDetailFragment : Fragment() {
             }
             return@OnTouchListener true
         })
+
+        setupMealSizeRadioButtons()
     }
 
     private fun subscribeToLiveData() {
@@ -97,6 +106,37 @@ class FoodDetailFragment : Fragment() {
         })
     }
 
+    private fun setupMealSizeRadioButtons() {
+        for (mealSize in args.food.size!!) {
+            val radioButton = RadioButton(context)
+            radioButton.setOnCheckedChangeListener { _, b ->
+                if (b)
+                    calculateTotalPrice(mealSize)
+            }
+            val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1F)
+            radioButton.layoutParams = params
+            radioButton.text = mealSize.name
+            radioButton.tag = mealSize.price
+            binding.radioGroup.addView(radioButton)
+        }
+        if (binding.radioGroup.childCount > 0){
+            val nRadioBtn = binding.radioGroup.getChildAt(0) as RadioButton
+            nRadioBtn.isChecked = true
+        }
+    }
+
+    private fun calculateTotalPrice(mealSize: SizeModel) {
+        var totalPrice = args.food.price.toDouble()
+        var displayPrice: Double
+
+        //size
+        totalPrice += mealSize.price.toDouble()
+        val quantity = binding.tvFoodQuantity.text.toString().toInt()
+        displayPrice = totalPrice * quantity
+        displayPrice = (displayPrice * 100.0).roundToInt() / 100.0
+        binding.tvFoodPrice.text = StringBuilder("").append(Common.formatPrice(displayPrice)).toString()
+
+    }
 
     private fun showRatingBottomSheet() {
         val currUser = Gson().fromJson(

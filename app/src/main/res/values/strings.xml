@@ -24,4 +24,7 @@
     <string name="last_name">Last name</string>
     <string name="phone">Phone</string>
     <string name="address">Address</string>
+    <string name="medium">Medium</string>
+    <string name="large">Large</string>
+    <string name="size">Size</string>
 </resources>
