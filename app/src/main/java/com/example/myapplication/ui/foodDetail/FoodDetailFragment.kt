@@ -18,28 +18,26 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.myapplication.MyApplication
 import com.example.myapplication.R
-import com.example.myapplication.databinding.BottomsheetRatingBinding
-import com.example.myapplication.databinding.FragmentFoodDetailBinding
-import com.example.myapplication.model.CommentModel
-import com.example.myapplication.model.FoodModel
-import com.example.myapplication.model.SizeModel
-import com.example.myapplication.model.UserModel
+import com.example.myapplication.databinding.*
+import com.example.myapplication.model.*
 import com.example.myapplication.utils.Common
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.google.gson.Gson
-import java.lang.StringBuilder
 import kotlin.math.roundToInt
 
 class FoodDetailFragment : Fragment() {
 
+    private var selectedAddons: MutableList<AddonModel>? = mutableListOf()
+    private var selectedMealSize: SizeModel? = null
     private var currentUser: FirebaseUser? = null
     private var _binding: FragmentFoodDetailBinding? = null
     private val binding get() = _binding!!
     private val args: FoodDetailFragmentArgs by navArgs()
     private val viewModel: FoodDetailViewModel by viewModels()
+    private lateinit var food: FoodModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,22 +57,25 @@ class FoodDetailFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupUI() {
+        food = args.food.copy()
         binding.topAppBar.setNavigationOnClickListener { findNavController().navigateUp() }
         var quantity = 1
         binding.btnIncrease.setOnClickListener {
             quantity++
             binding.tvFoodQuantity.text = quantity.toString()
-            binding.tvFoodPrice.text = (binding.tvFoodPrice.text.toString().toDouble() * quantity).toString()
+            calculateTotalPrice()
         }
         binding.btnDecrease.setOnClickListener {
-            if (quantity != 1) quantity--
-            binding.tvFoodQuantity.text = quantity.toString()
-            binding.tvFoodPrice.text = (binding.tvFoodPrice.text.toString().toDouble() * quantity).toString()
+            if (quantity != 1) {
+                quantity--
+                binding.tvFoodQuantity.text = quantity.toString()
+                calculateTotalPrice()
+            }
         }
 
         binding.btnShowComment.setOnClickListener {
             findNavController().navigate(
-                FoodDetailFragmentDirections.actionFoodDetailFragmentToCommentFragment(args.food.id!!)
+                FoodDetailFragmentDirections.actionFoodDetailFragmentToCommentFragment(food.id!!)
             )
         }
 
@@ -85,18 +86,20 @@ class FoodDetailFragment : Fragment() {
             return@OnTouchListener true
         })
 
+        binding.tvAddon.setOnClickListener { showAddonBottomSheet() }
+
         setupMealSizeRadioButtons()
     }
 
     private fun subscribeToLiveData() {
         currentUser = FirebaseAuth.getInstance().currentUser
         binding.lifecycleOwner = this
-        binding.food = args.food
-        binding.rBFood.rating = args.food.ratingValue.toFloat()
+        binding.food = food
+        binding.rBFood.rating = food.ratingValue.toFloat()
 
         viewModel.getCommentLiveData().observe(viewLifecycleOwner, {
             FirebaseDatabase.getInstance().getReference(Common.COMMENT_REF)
-                .child(args.food.id.toString()).push()
+                .child(food.id.toString()).push()
                 .setValue(it).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "OnCompleteListener: ${task.isSuccessful}")
@@ -107,11 +110,13 @@ class FoodDetailFragment : Fragment() {
     }
 
     private fun setupMealSizeRadioButtons() {
-        for (mealSize in args.food.size!!) {
+        for (mealSize in food.size!!) {
             val radioButton = RadioButton(context)
             radioButton.setOnCheckedChangeListener { _, b ->
-                if (b)
-                    calculateTotalPrice(mealSize)
+                if (b) {
+                    selectedMealSize = mealSize
+                    calculateTotalPrice()
+                }
             }
             val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1F)
             radioButton.layoutParams = params
@@ -119,23 +124,81 @@ class FoodDetailFragment : Fragment() {
             radioButton.tag = mealSize.price
             binding.radioGroup.addView(radioButton)
         }
-        if (binding.radioGroup.childCount > 0){
+        if (binding.radioGroup.childCount > 0) {
             val nRadioBtn = binding.radioGroup.getChildAt(0) as RadioButton
             nRadioBtn.isChecked = true
         }
     }
 
-    private fun calculateTotalPrice(mealSize: SizeModel) {
-        var totalPrice = args.food.price.toDouble()
+    private fun calculateTotalPrice() {
+        var totalPrice = food.price.toDouble()
         var displayPrice: Double
 
+        //addons
+        if (!selectedAddons.isNullOrEmpty())
+            for (selectedAddon in selectedAddons!!) {
+                totalPrice += selectedAddon.price
+                Log.d(TAG, "calculateTotalPrice: addon : ${selectedAddon.price}")
+            }
         //size
-        totalPrice += mealSize.price.toDouble()
+        totalPrice += selectedMealSize!!.price.toDouble()
+        Log.d(TAG, "calculateTotalPrice: size : ${selectedMealSize!!.price}")
         val quantity = binding.tvFoodQuantity.text.toString().toInt()
         displayPrice = totalPrice * quantity
         displayPrice = (displayPrice * 100.0).roundToInt() / 100.0
-        binding.tvFoodPrice.text = StringBuilder("").append(Common.formatPrice(displayPrice)).toString()
+        binding.tvFoodPrice.text =
+            StringBuilder("").append(Common.formatPrice(displayPrice)).toString()
+    }
 
+    private fun showAddonBottomSheet() {
+        val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
+        val dialogBinding = BottomsheetAddonBinding.inflate(LayoutInflater.from(requireContext()))
+        displayAddonList(dialogBinding)
+        bottomSheetDialog.setOnDismissListener {
+            displayUserSelectedAddons(selectedAddons!!)
+            calculateTotalPrice()
+        }
+        bottomSheetDialog.setContentView(dialogBinding.root)
+        bottomSheetDialog.show()
+
+    }
+
+    private fun displayAddonList(dialogBinding: BottomsheetAddonBinding) {
+        if (args.food.addon!!.isNotEmpty()) {
+            binding.chipGroup.clearCheck()
+            binding.chipGroup.removeAllViews()
+            for (addonModel in args.food.addon!!) {
+                val chip = ItemNormalChipBinding.inflate(layoutInflater)
+                chip.chip.text = java.lang.StringBuilder(addonModel.name!!).append("(+$")
+                    .append(addonModel.price).append(")")
+                chip.chip.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        selectedAddons!!.add(addonModel)
+                    }
+                }
+                dialogBinding.chipGroup.addView(chip.chip)
+            }
+        }
+    }
+
+    private fun displayUserSelectedAddons(displayAddonList: MutableList<AddonModel>) {
+        if (displayAddonList.size > 0) {
+            binding.chipGroup.removeAllViews()
+            for (addonModel in displayAddonList) {
+                val chip = ItemDeleteChipBinding.inflate(layoutInflater)
+                chip.chip.text = java.lang.StringBuilder(addonModel.name!!).append("(+$")
+                    .append(addonModel.price).append(")")
+                chip.chip.isClickable = false
+                chip.chip.setOnCloseIconClickListener {
+                    binding.chipGroup.removeView(it)
+                    displayAddonList.remove(addonModel)
+                    calculateTotalPrice()
+                }
+                binding.chipGroup.addView(chip.chip)
+            }
+        } else if (displayAddonList.size == 0) {
+            binding.chipGroup.removeAllViews()
+        }
     }
 
     private fun showRatingBottomSheet() {
@@ -165,13 +228,13 @@ class FoodDetailFragment : Fragment() {
 
     private fun addRatingToFood(ratingValue: Float) {
         FirebaseDatabase.getInstance().getReference(Common.CATEGORY)
-            .child(args.food.menuId.toString())
-            .child(Common.FOODS_REF).child(args.food.key.toString())
+            .child(food.menuId.toString())
+            .child(Common.FOODS_REF).child(food.key.toString())
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
                         val food = snapshot.getValue(FoodModel::class.java)
-                        food!!.key = args.food.key
+                        food!!.key = food.key
                         //Apply rating
                         val sumRating = food.ratingValue + ratingValue
                         val ratingCount = food.ratingCount + 1
